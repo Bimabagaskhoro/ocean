@@ -240,7 +240,7 @@ def main():
     print("\nChoose RPCS replacement option:")
     print("1. Replace with default RPCS configuration.")
     print("2. Alchemy.")
-    print("2. Infura.")
+    print("3. Infura.")
     choice = input("Enter 1 or 2: ").strip()
 
     if choice == '1':
