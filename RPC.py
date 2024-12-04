@@ -138,6 +138,69 @@ CUSTOM_RPCS_TEMPLATE = {
     }
 }
 
+CUSTOM_RPCS_TEMPLATE_INFURA = {
+    "1": {
+        "rpc": "https://mainnet.infura.io/v3/{API_KEY}",
+        "fallbackRPCs": [
+            "https://rpc.ankr.com/eth",
+            "https://1rpc.io/eth"
+        ],
+        "chainId": 1,
+        "network": "mainnet",
+        "chunkSize": 100
+    },
+    "10": {
+        "rpc": "https://optimism-mainnet.infura.io/v3/{API_KEY}",
+        "fallbackRPCs": [
+            "https://optimism-mainnet.public.blastapi.io",
+            "https://rpc.ankr.com/optimism",
+            "https://optimism-rpc.publicnode.com"
+        ],
+        "chainId": 10,
+        "network": "optimism",
+        "chunkSize": 100
+    },
+    "137": {
+        "rpc": "https://polygon-mainnet.infura.io/v3/{API_KEY}",
+        "fallbackRPCs": [
+            "https://polygon-mainnet.public.blastapi.io",
+            "https://1rpc.io/matic",
+            "https://rpc.ankr.com/polygon"
+        ],
+        "chainId": 137,
+        "network": "polygon",
+        "chunkSize": 100
+    },
+    "23294": {
+        "rpc": "https://sapphire.oasis.io",
+        "fallbackRPCs": [
+            "https://1rpc.io/oasis/sapphire"
+        ],
+        "chainId": 23294,
+        "network": "sapphire",
+        "chunkSize": 100
+    },
+    "11155111": {
+        "rpc": "https://sepolia.infura.io/v3/{API_KEY}",
+        "fallbackRPCs": [
+            "https://1rpc.io/sepolia"
+        ],
+        "chainId": 11155111,
+        "network": "sepolia",
+        "chunkSize": 100
+    },
+    "11155420": {
+        "rpc": "https://optimism-sepolia.infura.io/v3/{API_KEY}",
+        "fallbackRPCs": [
+            "https://endpoints.omniatech.io/v1/op/sepolia/public",
+            "https://optimism-sepolia.blockpi.network/v1/rpc/public"
+        ],
+        "chainId": 11155420,
+        "network": "optimism-sepolia",
+        "chunkSize": 100
+    }
+}
+
 def get_docker_compose_files():
     all_files = glob.glob("docker-compose*.yaml")
     files = [f for f in all_files if os.path.basename(f) != "docker-compose1.yaml"]
@@ -162,6 +225,12 @@ def construct_custom_rpcs(api_key):
         if "{API_KEY}" in config["rpc"]:
             rpcs[chain_id]["rpc"] = config["rpc"].replace("{API_KEY}", api_key)
     return rpcs
+def construct_custom_rpcs_infura(api_key):
+    rpcs = copy.deepcopy(CUSTOM_RPCS_TEMPLATE_INFURA)
+    for chain_id, config in rpcs.items():
+        if "{API_KEY}" in config["rpc"]:
+            rpcs[chain_id]["rpc"] = config["rpc"].replace("{API_KEY}", api_key)
+    return rpcs
 
 def main():
     files = get_docker_compose_files()
@@ -170,7 +239,8 @@ def main():
 
     print("\nChoose RPCS replacement option:")
     print("1. Replace with default RPCS configuration.")
-    print("2. Replace with custom RPCS configuration using your API key.")
+    print("2. Alchemy.")
+    print("2. Infura.")
     choice = input("Enter 1 or 2: ").strip()
 
     if choice == '1':
@@ -181,6 +251,12 @@ def main():
             print("API key cannot be empty.")
             return
         new_rpcs = construct_custom_rpcs(api_key)
+    elif choice == '3':
+        api_key = input("Enter your Infura API key: ").strip()
+        if not api_key:
+            print("API key cannot be empty.")
+            return
+        new_rpcs = construct_custom_rpcs_infura(api_key)
     else:
         print("Invalid choice. Exiting.")
         return
